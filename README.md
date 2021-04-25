@@ -11,7 +11,7 @@ Or you can do the steps manually yourself:
 
 ```
 ssh root@YOUR-FRESH-SERVER
-curl -s https://raw.githubusercontent.com/piku/piku/master/piku-bootstrap > piku-bootstrap
+curl -s https://raw.githubusercontent.com/piku/piku-bootstrap/master/piku-bootstrap > piku-bootstrap
 chmod 755 piku-bootstrap
 ./piku-bootstrap first-run
 ```
