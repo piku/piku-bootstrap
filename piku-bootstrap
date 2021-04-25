@@ -1,0 +1,116 @@
+#!/bin/sh
+
+# Usage:
+# To bootstrap your machine with piku:
+# 
+# ssh root@YOUR-MACHINE-IP
+# ./piku-bootstrap install
+
+# exit on error
+set -e
+
+PBD=${PIKU_BOOTSTRAP_DIR:-~/.piku-bootstrap}
+VENV="${PBD}/virtualenv"
+REPO="${PBD}/piku-bootstrap"
+VIRTUALENV_VERSION="20.0.0"
+ANSIBLE_VERSION="3.3.0"
+LOG="${PBD}/install.log"
+
+main() {
+  # print a message if this is a first time run
+  if [ ! -d "${PBD}" ]; then
+    echo "Looks like this is your first time running piku-bootstrap."
+    echo "This script will self-install dependencies into ${PBD} now."
+    echo "Hit enter to continue or ctrl-C to abort."
+    read discarded
+    echo
+  fi
+
+  # check python dependency
+  command -v python3 > /dev/null || apt install -y python3
+
+  # check git dependency
+  command -v git > /dev/null || apt install -y git
+
+  # check if ansible is installed
+  command -v ansible > /dev/null || apt install -y ansible
+
+  # ensure we have a dir
+  mkdir -p "${PBD}"
+
+  # ensure we have the piku repo checked out
+  if [ ! -d "${REPO}" ]; then
+    echo " #> Piku Bootstrap repo not found. Installing it into ${REPO}."
+    git clone https://github.com/piku/piku-bootstrap "${REPO}"
+  fi
+
+  if [ "$1" = "" ]
+  then
+    echo
+    echo "Usage:"
+    echo "       `basename $0` install [PLAYBOOK] [ANSIBLE_ARGS...]"
+    echo "       `basename $0` list-playbooks"
+    echo "       `basename $0` update"
+    echo
+    echo " PLAYBOOK  Optional playbook to deploy on to the server."
+    echo "           For example 'nodeenv.yml' installs nodeenv."
+    echo "           Can be an absolute path to your own playbook."
+    echo
+    echo " list-playbooks"
+    echo "          List available built-in playbooks."
+    echo
+    echo " update   Pull the piku-bootstrap repo to get the latest playbooks."
+    echo
+    echo "Notes:"
+    echo
+    echo " ** WARNING **"
+    echo " This script installs software and makes changes on this server."
+    echo " Only use a freshly provisioned server which you do not mind"
+    echo " being modified and reconfigured."
+    echo
+    echo " See https://github.com/piku/piku for details."
+    echo
+  else
+    case "$1" in
+      update)
+        echo "Updating piku repo."
+        cd "${REPO}"
+        git pull
+        ;;
+      first-run)
+        echo
+        echo " #> Success!"
+        echo
+        echo "The piku-bootstrap command is now installed in the current folder."
+        echo "Run './piku-bootstrap' with no arguments for help."
+        echo "To install Piku on this server for the first time run './piku-bootstrap install'."
+        echo ""
+        ;;
+      list-playbooks)
+        ls "${REPO}/playbooks"
+        ;;
+      install)
+        shift
+        if [ ! "$1" = "" -a -z "${1##*.yml*}" ];
+        then
+          playbook="$1"; shift;
+        else
+          playbook="piku.yml"
+        fi
+        if [ -z "${playbook##*.yml*}" ]; then
+          echo "Bootstrapping piku onto `hostname`"
+          builtin="${REPO}/playbooks/${playbook}"
+          if [ ! -f "${playbook}" -a -f "${builtin}" ]; then
+            echo "Using built-in playbook: ${playbook}"
+            playbook="${builtin}"
+          fi
+          ansible-playbook --connection=local -i "127.0.0.1", "${playbook}" -e 'ansible_python_interpreter=/usr/bin/python3' "$@"
+        else
+          echo "${playbook} is not a valid playbook name."
+        fi
+        ;;
+    esac
+  fi
+}
+
+main "$@"
