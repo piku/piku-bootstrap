@@ -73,7 +73,7 @@ main() {
   else
     case "$1" in
       update)
-        echo "Updating piku repo."
+        echo "Updating piku-bootstrap repo."
         cd "${REPO}"
         git pull
         ;;
