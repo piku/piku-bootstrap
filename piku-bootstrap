@@ -104,7 +104,7 @@ main() {
             echo "Using built-in playbook: ${playbook}"
             playbook="${builtin}"
           fi
-          ansible-playbook --connection=local -i "127.0.0.1", "${playbook}" -e 'ansible_python_interpreter=/usr/bin/python3' "$@"
+          ansible-playbook --connection=local -i "127.0.0.1", "${playbook}" -e 'ansible_python_interpreter=/usr/bin/python3' "$@" --extra-vars "piku_user=$PIKU_USER"
         else
           echo "${playbook} is not a valid playbook name."
         fi
