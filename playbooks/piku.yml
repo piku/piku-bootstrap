@@ -12,7 +12,7 @@
         password: !
         comment: PaaS access
         group: www-data
-    
+
     - name: Creates directory
       ansible.builtin.shell: |
         home_dir="/home/piku"
@@ -20,7 +20,7 @@
         group="www-data"
         ssh_user="root"
         install -d -m 0777 -o $user -g $group ${home_dir} # create directory with permissions
-    
+
     - name: Copy authorized_keys from root
       copy:
         src: "~{{ssh_user}}/.ssh/authorized_keys"
