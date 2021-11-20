@@ -38,11 +38,11 @@ Use `piku-bootstrap list-playbooks` to show a list of built-in playbooks, and th
 For example, to deploy `postgres` onto your server:
 
 ```shell
-piku-bootstrap postgres.yml
+piku-bootstrap install postgres.yml
 ```
 
 You can also use `piku-bootstrap` to run your own Ansible playbooks like this:
 
 ```shell
-piku-bootstrap ./myplaybook.yml
+piku-bootstrap install ./myplaybook.yml
 ```
