@@ -16,6 +16,8 @@ chmod 755 piku-bootstrap
 ./piku-bootstrap first-run
 ```
 
+Use `./piku-bootstrap first-run --no-interactive` to suppress the first-run prompt, for example if you are running this in a provisioning script.
+
 **Warning**: Please use a fresh Ubuntu server as this script will modify system level settings.
 See [piku.yml](./playbooks/piku.yml) to see what will be changed.
 
