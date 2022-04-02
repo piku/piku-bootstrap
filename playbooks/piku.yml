@@ -163,13 +163,13 @@
 
     - name: Get systemd.path piku-nginx.path
       get_url:
-        url: https://gist.githubusercontent.com/timhuebener/464b19c6d4623c513c7363e7f7f8bbc5/raw/3ded9f9fca17f402aaf42a3c98ab301e3de254fe/piku-nginx.path
+        url: https://raw.githubusercontent.com/piku/piku/master/piku-nginx.path
         dest: /etc/systemd/system/
       register: piku_nginx_path_installed
 
     - name: Get systemd.path piku-nginx.service
       get_url:
-        url: https://gist.githubusercontent.com/timhuebener/8e18be8a99bec7b721b75bd794041efe/raw/ee5d9b97417f40fad7cbb4afe45ad01b0cc3a391/piku-nginx.service
+        url: https://raw.githubusercontent.com/piku/piku/master/piku-nginx.service
         dest: /etc/systemd/system/
       register: piku_nginx_service_installed
 
