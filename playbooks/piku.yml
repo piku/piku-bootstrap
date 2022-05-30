@@ -174,7 +174,7 @@
       register: piku_nginx_service_installed
 
     - name: Start piku-nginx.path
-      ansible.builtin.systemd:
+      systemd:
         name: piku-nginx.path
         state: started
         enabled: yes
