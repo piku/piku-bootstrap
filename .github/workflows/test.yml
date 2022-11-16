@@ -8,4 +8,5 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - run: ./piku-bootstrap first-run --no-interactive
+      - run: ./piku-bootstrap install
 
