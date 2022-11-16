@@ -1,10 +1,6 @@
 name: Install test
 on: [push]
 jobs:
-  install:
-    steps:
-      - run: echo "Running install tests"
-
   install-20:
     runs-on: ubuntu-latest
     steps:
