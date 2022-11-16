@@ -1,0 +1,10 @@
+name: Install test
+on: [push]
+jobs:
+  install-20:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🐧 Running on ${{ runner.os }}!"
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: ./piku-bootstrap --no-interactive
