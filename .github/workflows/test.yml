@@ -7,4 +7,5 @@ jobs:
       - run: echo "🐧 Running on ${{ runner.os }}!"
       - name: Check out repository code
         uses: actions/checkout@v3
-      - run: ./piku-bootstrap --no-interactive
+      - run: ./piku-bootstrap first-run --no-interactive
+
