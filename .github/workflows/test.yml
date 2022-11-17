@@ -10,6 +10,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: ./piku-bootstrap first-run --no-interactive
-      - run: cd ~/.piku-bootstrap/piku-bootstrap && git checkout automated-testing
+      - run: cd ~/.piku-bootstrap/piku-bootstrap && git checkout ${{ github.ref }}
       - run: ./piku-bootstrap install
 
