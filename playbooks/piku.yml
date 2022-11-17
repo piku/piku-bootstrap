@@ -26,6 +26,10 @@
         path: "~{{ssh_user}}/.ssh/authorized_keys"
       register: stat_keys_result
 
+    - debug:
+        msg: "Warning: No authorized_keys for root found. You must add keys manually."
+      when: not stat_keys_result.stat.exists
+
     - name: Copy authorized_keys from root
       copy:
         src: "~{{ssh_user}}/.ssh/authorized_keys"
@@ -34,10 +38,6 @@
         owner: "{{user}}"
         group: www-data
       when: stat_keys_result.stat.exists
-
-    - debug:
-        msg: "Warning: No authorized_keys for root found. You must add keys manually."
-      when: not stat_keys_result.stat.exists
 
     - name: Install Debian Packages
       apt:
