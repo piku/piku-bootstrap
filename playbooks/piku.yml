@@ -35,7 +35,8 @@
         group: www-data
       when: stat_keys_result.stat.exists
 
-    - name: Warning: No authorized_keys for root found. You must add keys manually.
+    - debug:
+        msg: "Warning: No authorized_keys for root found. You must add keys manually."
       when: not stat_keys_result.stat.exists
 
     - name: Install Debian Packages
