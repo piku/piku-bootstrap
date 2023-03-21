@@ -33,14 +33,17 @@ main() {
     esac
   fi
 
+  # make sure package repos are up to date
+  apt-get update
+
   # check python dependency
-  command -v python3 > /dev/null || apt install -y python3
+  command -v python3 > /dev/null || apt-get install -y python3
 
   # check git dependency
-  command -v git > /dev/null || apt install -y git
+  command -v git > /dev/null || apt-get install -y git
 
   # check if ansible is installed
-  command -v ansible > /dev/null || apt install -y ansible
+  command -v ansible > /dev/null || apt-get install -y ansible
 
   # ensure we have a dir
   mkdir -p "${PBD}"
