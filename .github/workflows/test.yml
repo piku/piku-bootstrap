@@ -1,8 +1,10 @@
 name: Install test
 on: [push]
 jobs:
-  install-20:
-    runs-on: ubuntu-latest
+  install-18:
+    container:
+      image: "ubuntu:18.04"
+    # runs-on: ubuntu-latest
     steps:
       - run: echo "🐧 Running on ${{ runner.os }}!"
       - name: Check out repository code
