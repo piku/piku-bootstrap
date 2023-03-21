@@ -33,6 +33,9 @@ main() {
     esac
   fi
 
+  # make sure package repos are up to date
+  apt-get update
+
   # check python dependency
   command -v python3 > /dev/null || apt-get install -y python3
 
