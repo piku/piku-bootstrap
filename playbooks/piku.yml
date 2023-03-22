@@ -198,4 +198,4 @@
         name: piku-nginx.path
         state: started
         enabled: yes
-      when: piku_nginx_service_installed is changed
+      when: ( piku_nginx_service_installed is changed ) and ( "systemctl" in systemctl.stdout )
