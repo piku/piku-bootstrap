@@ -1,13 +1,16 @@
 name: Install test
 on: [push]
 jobs:
-  install-18:
+  piku-bootstrap-install:
     runs-on: ubuntu-latest
     env:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
+    strategy:
+      matrix:
+        version: ["ubuntu:18.04", "ubuntu:20.04", "ubuntu:22.04"]
     container:
-      image: "ubuntu:18.04"
+      image: ${{ matrix.version }}
     steps:
       - run: echo "🐧 Running on ${{ runner.os }}!"
       - run: cat /etc/lsb-release
