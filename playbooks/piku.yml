@@ -152,6 +152,7 @@
     - name: Test if systemctl is present
       shell: command -v systemctl
       register: systemctl
+      ignore_errors: true
 
     - name: Enable uwsgi-piku service
       systemd:
