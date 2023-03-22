@@ -8,7 +8,7 @@ jobs:
       LANG: C.UTF-8
     strategy:
       matrix:
-        version: ["ubuntu:18.04", "ubuntu:20.04", "ubuntu:22.04"]
+        version: ["ubuntu:22.04", "ubuntu:20.04", "ubuntu:18.04"]
     container:
       image: ${{ matrix.version }}
     steps:
