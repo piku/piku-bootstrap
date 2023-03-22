@@ -1,7 +1,0 @@
-name: Install test
-on: [push]
-jobs:
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - run: ./piku-bootstrap --no-interactive
