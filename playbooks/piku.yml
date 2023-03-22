@@ -105,7 +105,7 @@
 
     - name: Ask piku to use SSH keys
       shell: echo "{{item}}" > /tmp/id_rsa.pub && python3 ~/piku.py setup:ssh /tmp/id_rsa.pub && rm /tmp/id_rsa.pub
-      with_lines: cat /tmp/root_authorized_keys
+      with_lines: " [ -f /tmp/root_authorized_keys ] && cat /tmp/root_authorized_keys || echo '' "
       args:
         creates: ~/.ssh/authorized_keys
       when: stat_keys_result.stat.exists
