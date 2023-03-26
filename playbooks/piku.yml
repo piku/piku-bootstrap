@@ -135,6 +135,18 @@
         executable: /bin/bash
       when: acme_installer is defined
 
+    - name: Run a manual upgrade
+      shell: ./.acme.sh/acme.sh --upgrade
+      args:
+        chdir: ~/
+        executable: /bin/bash
+
+    - name: Set default CA to letsencrypt
+      shell: ./.acme.sh/acme.sh --set-default-ca --server letsencrypt
+      args:
+        chdir: ~/
+        executable: /bin/bash
+
     - name: Remove acme.sh installer
       file: path=~/acme.sh state=absent
       when: acme_installer is defined
