@@ -6,6 +6,7 @@ jobs:
     env:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
+      TZ: Europe/London
     strategy:
       matrix:
         version: ["ubuntu:22.04", "ubuntu:20.04"]
@@ -14,6 +15,7 @@ jobs:
     steps:
       - run: echo "🐧 Running on ${{ runner.os }}!"
       - run: cat /etc/lsb-release
+      - run: ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
