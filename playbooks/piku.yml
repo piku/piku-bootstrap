@@ -177,6 +177,7 @@
     - name: Start uwsgi init script
       service:
         name: uwsgi-piku
+        enabled: yes
         state: started
       when: '"systemctl" not in systemctl.stdout'
 
