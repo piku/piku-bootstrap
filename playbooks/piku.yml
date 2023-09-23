@@ -110,7 +110,7 @@
         creates: ~/.ssh/authorized_keys
       when: stat_keys_result.stat.exists
 
-    - name: Delete root authorized keys file
+    - name: Delete temporary authorized keys file
       file: path=/tmp/root_authorized_keys state=absent
       when: stat_keys_result.stat.exists
 
