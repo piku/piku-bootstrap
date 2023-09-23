@@ -173,6 +173,13 @@
         state: started
         masked: no
       when: '"systemctl" in systemctl.stdout'
+      register: uwsgi_systemd
+
+    # https://github.com/ansible/ansible/issues/72451
+    - name: Actually enable uwsgi-piku service (bug workaround)
+      shell:
+        cmd: "systemctl enable uwsgi-piku.service"
+      when: '"systemctl" in systemctl.stdout and uwsgi_systemd.status.UnitFileState == "enabled-runtime"'
 
     - name: Start uwsgi init script
       service:
