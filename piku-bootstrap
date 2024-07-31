@@ -10,24 +10,21 @@
 set -e
 
 PBD=${PIKU_BOOTSTRAP_DIR:-~/.piku-bootstrap}
-VENV="${PBD}/virtualenv"
 REPO="${PBD}/piku-bootstrap"
-VIRTUALENV_VERSION="20.0.0"
-ANSIBLE_VERSION="3.3.0"
-LOG="${PBD}/install.log"
 
 main() {
   # print a message if this is a first time run
   if [ ! -d "${PBD}" ]; then
     case "$2" in
       --no-interactive)
+        shift
         ;;
       *)
         echo "Looks like this is your first time running piku-bootstrap."
         echo "This script will self-install dependencies into ${PBD} now."
         echo "Hit enter to continue or ctrl-C to abort."
         echo "(Use './piku-bootstrap first-run --no-interactive' to suppress this message.)"
-        read discarded
+        read -r _discarded
         echo
         ;;
     esac
@@ -56,11 +53,12 @@ main() {
 
   if [ "$1" = "" ]
   then
+    me=$(basename "$0")
     echo
     echo "Usage:"
-    echo "       `basename $0` install [PLAYBOOK] [ANSIBLE_ARGS...]"
-    echo "       `basename $0` list-playbooks"
-    echo "       `basename $0` update"
+    echo "       ${me} install [PLAYBOOK] [ANSIBLE_ARGS...]"
+    echo "       ${me} list-playbooks"
+    echo "       ${me} update"
     echo
     echo " PLAYBOOK  Optional playbook to deploy on to the server."
     echo "           For example 'nodeenv.yml' installs nodeenv."
@@ -101,16 +99,16 @@ main() {
         ;;
       install)
         shift
-        if [ ! "$1" = "" -a -z "${1##*.yml*}" ];
+        if [ ! "$1" = "" ] && [ -z "${1##*.yml*}" ];
         then
           playbook="$1"; shift;
         else
           playbook="piku.yml"
         fi
         if [ -z "${playbook##*.yml*}" ]; then
-          echo "Bootstrapping piku onto `hostname`"
+          echo "Bootstrapping piku onto $(hostname)"
           builtin="${REPO}/playbooks/${playbook}"
-          if [ ! -f "${playbook}" -a -f "${builtin}" ]; then
+          if [ ! -f "${playbook}" ] && [ -f "${builtin}" ]; then
             echo "Using built-in playbook: ${playbook}"
             playbook="${builtin}"
           fi
