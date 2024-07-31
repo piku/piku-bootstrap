@@ -1,0 +1,6 @@
+---
+- hosts: all
+  tasks:
+    - name: Install postgres
+      apt:
+        name: ["uwsgi-plugin-php"]
