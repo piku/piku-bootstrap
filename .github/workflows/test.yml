@@ -14,7 +14,7 @@ jobs:
       image: ${{ matrix.version }}
     steps:
       - run: echo "🐧 Running on ${{ runner.os }}!"
-      - run: cat /etc/lsb-release
+      - run: cat /etc/os-release
       - run: ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
       - name: Check out repository code
         uses: actions/checkout@v3
