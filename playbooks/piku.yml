@@ -76,8 +76,8 @@
 
     - name: Install uwsgi-piku systemd script
       get_url:
-        url: https://raw.githubusercontent.com/piku/piku/master/uwsgi-piku.service
-        dest: /etc/systemd/system/uwsgi-piku.service
+        url: https://raw.githubusercontent.com/piku/piku/master/uwsgi-piku@.service
+        dest: /etc/systemd/system/uwsgi-piku@.service
         mode: 0600
 
     - name: Create piku ansible tmp dir
@@ -168,7 +168,7 @@
 
     - name: Enable uwsgi-piku service
       systemd:
-        name: uwsgi-piku
+        name: uwsgi-piku@{{ user }}
         enabled: yes
         state: started
         masked: no
@@ -178,7 +178,7 @@
     # https://github.com/ansible/ansible/issues/72451
     - name: Actually enable uwsgi-piku service (bug workaround)
       shell:
-        cmd: "systemctl enable uwsgi-piku.service"
+        cmd: "systemctl enable uwsgi-piku@{{ user }}.service"
       when: '"systemctl" in systemctl.stdout and uwsgi_systemd.status.UnitFileState == "enabled-runtime"'
 
     - name: Start uwsgi init script
@@ -201,9 +201,9 @@
         state: restarted
       when: nginx_config_installed is changed
 
-    - name: Get systemd.path piku-nginx.path
+    - name: Get systemd.path piku-nginx@.path
       get_url:
-        url: https://raw.githubusercontent.com/piku/piku/master/piku-nginx.path
+        url: https://raw.githubusercontent.com/piku/piku/master/piku-nginx@.path
         dest: /etc/systemd/system/
       register: piku_nginx_path_installed
 
@@ -213,9 +213,9 @@
         dest: /etc/systemd/system/
       register: piku_nginx_service_installed
 
-    - name: Start piku-nginx.path
+    - name: Start piku-nginx@.path
       systemd:
-        name: piku-nginx.path
+        name: piku-nginx@{{ user }}.path
         state: started
         enabled: yes
       when: ( piku_nginx_service_installed is changed ) and ( "systemctl" in systemctl.stdout )
