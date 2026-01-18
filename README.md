@@ -31,6 +31,34 @@ The script will display a usage message and you can then bootstrap your server:
 
 Once you're done head over to the [Piku documentation](https://github.com/piku/piku/#using-piku) to see how to deploy your first app.
 
+### Multi-Environment Setup
+
+You can run multiple piku environments on the same server (e.g., production, staging, dev). Use the `PIKU_USER` environment variable to specify the username for each environment:
+
+```shell
+# Install default piku environment
+./piku-bootstrap install
+
+# Install staging environment
+PIKU_USER=piku-staging ./piku-bootstrap install
+
+# Install dev environment
+PIKU_USER=piku-dev ./piku-bootstrap install
+```
+
+Each environment runs its own uWSGI emperor and nginx path watcher. Apps in different environments can have the same name without conflict.
+
+**Deploying to different environments:**
+
+```shell
+# From your development machine
+git remote add production piku@yourserver:myapp
+git remote add staging piku-staging@yourserver:myapp
+
+git push staging feature-branch
+git push production main
+```
+
 ### Installing other dependencies
 
 `piku-bootstrap` uses Ansible internally and it comes with some extra built-in playbooks which you can use to bootstrap common components onto your `piku` server.
