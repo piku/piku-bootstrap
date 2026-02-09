@@ -5,6 +5,9 @@
 # 
 # ssh root@YOUR-MACHINE-IP
 # ./piku-bootstrap install
+#
+# To install from a fork:
+# ./piku-bootstrap install --piku-repo=youruser/piku --piku-branch=yourbranch
 
 # exit on error
 set -e
@@ -56,13 +59,18 @@ main() {
     me=$(basename "$0")
     echo
     echo "Usage:"
-    echo "       ${me} install [PLAYBOOK] [ANSIBLE_ARGS...]"
+    echo "       ${me} install [PLAYBOOK] [OPTIONS] [ANSIBLE_ARGS...]"
     echo "       ${me} list-playbooks"
     echo "       ${me} update"
     echo
     echo " PLAYBOOK  Optional playbook to deploy on to the server."
     echo "           For example 'nodeenv.yml' installs nodeenv."
     echo "           Can be an absolute path to your own playbook."
+    echo
+    echo " OPTIONS for install:"
+    echo "   --piku-repo=OWNER/REPO   GitHub repository to install piku from"
+    echo "                            (default: piku/piku)"
+    echo "   --piku-branch=BRANCH     Branch to install from (default: master)"
     echo
     echo " list-playbooks"
     echo "          List available built-in playbooks."
@@ -77,6 +85,12 @@ main() {
     echo " being modified and reconfigured."
     echo
     echo " See https://github.com/piku/piku for details."
+    echo
+    echo "Examples:"
+    echo "  ${me} install                              # Install from upstream piku/piku"
+    echo "  ${me} install --piku-repo=youruser/piku    # Install from your fork"
+    echo "  ${me} install --piku-branch=develop        # Install from develop branch"
+    echo "  ${me} install --piku-repo=youruser/piku --piku-branch=feature-xyz"
     echo
   else
     case "$1" in
@@ -99,20 +113,73 @@ main() {
         ;;
       install)
         shift
+        
+        # Parse --piku-repo and --piku-branch options
+        PIKU_REPO=""
+        PIKU_BRANCH=""
+        REMAINING_ARGS=""
+        
+        while [ $# -gt 0 ]; do
+          case "$1" in
+            --piku-repo=*)
+              PIKU_REPO="${1#*=}"
+              shift
+              ;;
+            --piku-branch=*)
+              PIKU_BRANCH="${1#*=}"
+              shift
+              ;;
+            *)
+              if [ -z "$REMAINING_ARGS" ]; then
+                REMAINING_ARGS="$1"
+              else
+                REMAINING_ARGS="$REMAINING_ARGS $1"
+              fi
+              shift
+              ;;
+          esac
+        done
+        
+        # Re-parse remaining args for playbook detection
+        set -- $REMAINING_ARGS
+        
         if [ ! "$1" = "" ] && [ -z "${1##*.yml*}" ];
         then
           playbook="$1"; shift;
         else
           playbook="piku.yml"
         fi
+        
+        # Rebuild remaining args after playbook extraction
+        REMAINING_ARGS="$*"
+        
         if [ -z "${playbook##*.yml*}" ]; then
           echo "Bootstrapping piku onto $(hostname)"
+          
+          # Show fork info if using non-default settings
+          if [ -n "$PIKU_REPO" ]; then
+            echo "Using piku repository: $PIKU_REPO"
+          fi
+          if [ -n "$PIKU_BRANCH" ]; then
+            echo "Using piku branch: $PIKU_BRANCH"
+          fi
+          
           builtin="${REPO}/playbooks/${playbook}"
           if [ ! -f "${playbook}" ] && [ -f "${builtin}" ]; then
             echo "Using built-in playbook: ${playbook}"
             playbook="${builtin}"
           fi
-          ansible-playbook --connection=local -i "127.0.0.1", "${playbook}" -e 'ansible_python_interpreter=/usr/bin/python3' "$@" --extra-vars "piku_user=$PIKU_USER"
+          
+          # Build extra-vars string
+          EXTRA_VARS="piku_user=$PIKU_USER"
+          if [ -n "$PIKU_REPO" ]; then
+            EXTRA_VARS="$EXTRA_VARS piku_repo=$PIKU_REPO"
+          fi
+          if [ -n "$PIKU_BRANCH" ]; then
+            EXTRA_VARS="$EXTRA_VARS piku_branch=$PIKU_BRANCH"
+          fi
+          
+          ansible-playbook --connection=local -i "127.0.0.1", "${playbook}" -e 'ansible_python_interpreter=/usr/bin/python3' $REMAINING_ARGS --extra-vars "$EXTRA_VARS"
         else
           echo "${playbook} is not a valid playbook name."
         fi

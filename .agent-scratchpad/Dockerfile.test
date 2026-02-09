@@ -1,0 +1,22 @@
+# Use jrei/systemd-ubuntu which has systemd properly configured for Docker
+FROM jrei/systemd-ubuntu:22.04
+
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install minimal dependencies needed for piku-bootstrap to start
+RUN apt-get update && apt-get install -y \
+    curl \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the local piku-bootstrap files
+COPY piku-bootstrap /root/piku-bootstrap
+COPY playbooks /root/playbooks
+
+RUN chmod 755 /root/piku-bootstrap
+
+WORKDIR /root
+
+# systemd needs to be PID 1
+CMD ["/lib/systemd/systemd"]

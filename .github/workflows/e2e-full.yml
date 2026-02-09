@@ -1,0 +1,124 @@
+name: E2E Full Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      piku_repo:
+        description: 'Piku repository (owner/repo)'
+        required: false
+        default: 'piku/piku'
+      piku_branch:
+        description: 'Piku branch'
+        required: false
+        default: 'master'
+      test_filter:
+        description: 'Test filter pattern (e.g., "python", "nodejs")'
+        required: false
+        default: ''
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Set environment variables
+        run: |
+          echo "PIKU_REPO=${{ github.event.inputs.piku_repo || 'piku/piku' }}" >> $GITHUB_ENV
+          echo "PIKU_BRANCH=${{ github.event.inputs.piku_branch || 'master' }}" >> $GITHUB_ENV
+          echo "TEST_FILTER=${{ github.event.inputs.test_filter || '' }}" >> $GITHUB_ENV
+      
+      - name: Run E2E tests
+        run: |
+          cd tests/e2e
+          chmod +x run_e2e_tests.sh
+          if [ -n "$TEST_FILTER" ]; then
+            ./run_e2e_tests.sh "$TEST_FILTER"
+          elif [ "$PIKU_REPO" = "piku/piku" ] && [ "$PIKU_BRANCH" = "master" ]; then
+            # Skip python_uv tests when using piku/piku master (no UV support)
+            echo "Skipping python_uv tests (piku/piku master does not support UV)"
+            ./run_e2e_tests.sh nodejs python_pip piku_commands
+          else
+            ./run_e2e_tests.sh
+          fi
+        env:
+          PIKU_REPO: ${{ env.PIKU_REPO }}
+          PIKU_BRANCH: ${{ env.PIKU_BRANCH }}
+
+  e2e-python-pip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Run Python pip tests
+        run: |
+          cd tests/e2e
+          chmod +x run_e2e_tests.sh
+          ./run_e2e_tests.sh python_pip
+        env:
+          PIKU_REPO: ${{ github.event.inputs.piku_repo || 'piku/piku' }}
+          PIKU_BRANCH: ${{ github.event.inputs.piku_branch || 'master' }}
+
+  # This job uses a different piku branch that includes UV support fixes
+  # (clusterfudge/piku:claude/fix-piku-uv-support-ILtq9) until merged upstream
+  e2e-python-uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Run Python UV tests
+        run: |
+          cd tests/e2e
+          chmod +x run_e2e_tests.sh
+          ./run_e2e_tests.sh python_uv
+        env:
+          # Use clusterfudge/piku with UV fixes until merged upstream
+          PIKU_REPO: ${{ github.event.inputs.piku_repo || 'clusterfudge/piku' }}
+          PIKU_BRANCH: ${{ github.event.inputs.piku_branch || 'claude/fix-piku-uv-support-ILtq9' }}
+
+  e2e-nodejs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Run Node.js tests
+        run: |
+          cd tests/e2e
+          chmod +x run_e2e_tests.sh
+          ./run_e2e_tests.sh nodejs
+        env:
+          PIKU_REPO: ${{ github.event.inputs.piku_repo || 'piku/piku' }}
+          PIKU_BRANCH: ${{ github.event.inputs.piku_branch || 'master' }}
+
+  e2e-commands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Run piku command tests
+        run: |
+          cd tests/e2e
+          chmod +x run_e2e_tests.sh
+          ./run_e2e_tests.sh piku_commands
+        env:
+          PIKU_REPO: ${{ github.event.inputs.piku_repo || 'piku/piku' }}
+          PIKU_BRANCH: ${{ github.event.inputs.piku_branch || 'master' }}

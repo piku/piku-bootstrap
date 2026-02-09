@@ -1,0 +1,35 @@
+services:
+  piku-server:
+    build:
+      context: ../../
+      dockerfile: tests/e2e/server/Dockerfile
+    hostname: piku-server
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - shared-keys:/shared-keys
+    cgroup: host
+    networks:
+      - piku-network
+
+  test-client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    hostname: test-client
+    networks:
+      - piku-network
+    volumes:
+      - ./tests:/tests:ro
+      - ./lib:/test-lib:ro
+      - shared-keys:/shared-keys:ro
+    environment:
+      - PIKU_SERVER=piku-server
+    command: ["sleep", "infinity"]
+
+networks:
+  piku-network:
+    driver: bridge
+
+volumes:
+  shared-keys:
